@@ -2,8 +2,7 @@
   "name": "sui-mcp",
   "type": "module",
   "scripts": {
-    "dev": "pnpx @modelcontextprotocol/inspector bun ./src/index.ts",
-    "dev:server": "bun run --watch src/index.ts"
+    "dev": "pnpx @modelcontextprotocol/inspector bun ./src/index.ts start -c --loglevel debug"
   },
   "dependencies": {
     "@drizzle-team/brocli": "^0.11.0",
