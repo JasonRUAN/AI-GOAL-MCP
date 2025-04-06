@@ -1,7 +1,7 @@
 {
 	"name": "@jordangens/sui-mcp",
 	"type": "module",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"private": false,
 	"bin": {
 		"sui-mcp": "cli.js"
@@ -13,10 +13,7 @@
 		"start": "node ./cli.js",
 		"prepare": "pnpm run build"
 	},
-	"files": [
-		"cli.js",
-		"dist"
-	],
+	"files": ["cli.js", "dist"],
 	"publishConfig": {
 		"access": "public"
 	},

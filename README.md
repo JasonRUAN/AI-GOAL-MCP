@@ -4,36 +4,41 @@ An [MCP server](https://modelcontextprotocol.io/) for the [Sui network](https://
 
 ## Usage
 
-You'll need to have the Sui CLI installed and setup before you can use SuiMCP. You can follow the directions here: [Sui CLI](https://docs.sui.io/references/cli).
+To get started, run the following init command to setup SuiMCP:
 
-You can configure your client with the following
+```bash
+npx @jordangens/sui-mcp@latest init
+```
+
+This will setup the Wallet that you'll use to interact with the chain. You can then configure your client with the following MCP configuration:
 
 ```json
 {
   "mcpServers": {
     "suiMcp": {
       "command": "npx",
-      "args": ["@jordangens/sui-mcp", "start"]
+      "args": ["@jordangens/sui-mcp@latest", "start"]
     }
   }
 }
 ```
 
-Here's the documentation for popular clients:
+Here's the MCP documentation for popular clients:
 
 - **[Cursor Guide](https://docs.cursor.com/context/model-context-protocol)**
 - **[Claude Desktop Guide](https://modelcontextprotocol.io/quickstart/user)**
+
+### Building Move
+
+To build Move packages, you'll to have the Sui CLI installed and setup before you can use SuiMCP. You can follow the directions here: [Sui CLI](https://docs.sui.io/references/cli).
 
 ## Features
 
 ### Tools
 
-- **current_address** - Get the current wallet address
-- **list_addresses** - List all addresses for the current wallet
-- **switch_address** - Switch to a different address
-- **set_current_network** - Set the current Sui network
-- **get_current_network** - Get the current Sui network
-- **list_networks** - List all available Sui networks
+- **get_default_address** - Get the default wallet address
+- **list_addresses** - List all addresses available for the current wallet
+- **set_default_address** - Set the default address of the wallet
 - **get_balance** - Get the balance of a specific coin type for a wallet
 - **get_all_balances** - Get all balances for a wallet
 - **get_owned_coin_objects** - Get coin objects owned by a wallet, by coin type
@@ -42,4 +47,4 @@ Here's the documentation for popular clients:
 - **get_transaction** - Get a transaction by its ID
 - **build_move_package** - Build a Sui Move package to bytecode
 - **test_move_package** - Test a Sui Move package
-- **publish_move_package** - Publish a Sui Move package to the Sui blockchain. This tool will also build the package.
+- **publish_move_package** - Publish a Sui Move package to the Sui blockchain. This tool will also run Move build and Move test.
