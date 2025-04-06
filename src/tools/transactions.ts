@@ -1,43 +1,43 @@
-import { describeTool, mValidator, type ToolResponseType } from "muppet";
+import { type ToolResponseType, describeTool, mValidator } from "muppet";
 import { z } from "zod";
-import { cli } from "../utils/suiCli.js";
 import { app } from "../server/app.js";
+import { cli } from "../utils/suiCli.js";
 
 app.post(
-  "/get-transaction",
-  describeTool({
-    name: "get-transaction",
-    description: "Get a transaction by its ID",
-  }),
-  mValidator(
-    "json",
-    z.object({
-      digest: z
-        .string()
-        .describe("The ID of the transaction you'd like to get."),
-    })
-  ),
-  async (c) => {
-    const { digest } = c.req.valid("json");
+	"/get-transaction",
+	describeTool({
+		name: "get-transaction",
+		description: "Get a transaction by its ID",
+	}),
+	mValidator(
+		"json",
+		z.object({
+			digest: z
+				.string()
+				.describe("The ID of the transaction you'd like to get."),
+		}),
+	),
+	async (c) => {
+		const { digest } = c.req.valid("json");
 
-    const suiClient = await cli.getSuiClient();
+		const suiClient = await cli.getSuiClient();
 
-    const transaction = await suiClient.getTransactionBlock({
-      digest,
-      options: {
-        showBalanceChanges: true,
-        showEffects: true,
-        showEvents: true,
-        showObjectChanges: true,
-        showInput: true,
-      },
-    });
+		const transaction = await suiClient.getTransactionBlock({
+			digest,
+			options: {
+				showBalanceChanges: true,
+				showEffects: true,
+				showEvents: true,
+				showObjectChanges: true,
+				showInput: true,
+			},
+		});
 
-    return c.json<ToolResponseType>([
-      {
-        type: "text",
-        text: JSON.stringify(transaction, null, 2),
-      },
-    ]);
-  }
+		return c.json<ToolResponseType>([
+			{
+				type: "text",
+				text: JSON.stringify(transaction, null, 2),
+			},
+		]);
+	},
 );
