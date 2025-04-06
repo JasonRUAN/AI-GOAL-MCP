@@ -1,5 +1,5 @@
 import { registerResources, type Resource } from "muppet";
-import { app } from "../app.js";
+import { app } from "../server/app.js";
 
 // TODO: Add TS SDK docs:
 app.post(

@@ -2,17 +2,22 @@
   "name": "sui-mcp",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts"
+    "dev": "pnpx @modelcontextprotocol/inspector bun ./src/index.ts",
+    "dev:server": "bun run --watch src/index.ts"
   },
   "dependencies": {
+    "@drizzle-team/brocli": "^0.11.0",
     "@hono/node-server": "^1.14.0",
     "@hono/standard-validator": "^0.1.2",
+    "@modelcontextprotocol/inspector": "^0.8.1",
     "@modelcontextprotocol/sdk": "^1.8.0",
     "@mysten/sui": "^1.26.1",
     "@types/bun": "^1.2.8",
     "hono": "^4.7.5",
     "muppet": "^0.2.0",
-    "zod": "^3.24.2"
+    "pino": "^9.6.0",
+    "zod": "^3.24.2",
+    "zod-opts": "^0.1.8"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",

@@ -1,5 +1,5 @@
 import { describeTool, mValidator, type ToolResponseType } from "muppet";
-import { app } from "../app.js";
+import { app } from "../server/app.js";
 import { z } from "zod";
 
 app.post(
