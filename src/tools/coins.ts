@@ -2,7 +2,7 @@ import { SUI_TYPE_ARG } from "@mysten/sui/utils";
 import { type ToolResponseType, describeTool, mValidator } from "muppet";
 import { z } from "zod";
 import { app } from "../server/app.js";
-import { optionalAddress } from "../utils/schema.js";
+import { optionalAddress, optionalNetwork } from "../utils/schema.js";
 import { cli } from "../utils/suiCli.js";
 
 app.post(
@@ -14,6 +14,7 @@ app.post(
 	mValidator(
 		"json",
 		z.object({
+			network: optionalNetwork,
 			address: optionalAddress,
 			coinType: z
 				.string()
@@ -24,20 +25,24 @@ app.post(
 		}),
 	),
 	async (c) => {
-		const { address, coinType } = c.req.valid("json");
+		const { network, address, coinType } = c.req.valid("json");
 
-		const suiClient = await cli.getSuiClient();
-
-		// TODO: Coin metadata + decimals formatting:
-		const balance = await suiClient.getBalance({
-			owner: address,
-			coinType,
-		});
+		const [balance, metadata] = await Promise.all([
+			network.client.getBalance({
+				owner: address,
+				coinType,
+			}),
+			network.client.getCoinMetadata({ coinType }),
+		]);
 
 		return c.json<ToolResponseType>([
 			{
 				type: "text",
-				text: `Balance for ${address} (${coinType}) is ${balance}`,
+				text: JSON.stringify({
+					// TODO: Format balance with decimals:
+					balance,
+					metadata,
+				}),
 			},
 		]);
 	},
@@ -52,15 +57,14 @@ app.post(
 	mValidator(
 		"json",
 		z.object({
+			network: optionalNetwork,
 			address: optionalAddress,
 		}),
 	),
 	async (c) => {
-		const { address } = c.req.valid("json");
+		const { network, address } = c.req.valid("json");
 
-		const suiClient = await cli.getSuiClient();
-
-		const balances = await suiClient.getAllBalances({
+		const balances = await network.client.getAllBalances({
 			owner: address,
 		});
 
@@ -82,6 +86,7 @@ app.post(
 	mValidator(
 		"json",
 		z.object({
+			network: optionalNetwork,
 			address: optionalAddress,
 			coinType: z
 				.string()
@@ -92,11 +97,9 @@ app.post(
 		}),
 	),
 	async (c) => {
-		const { address, coinType } = c.req.valid("json");
+		const { network, address, coinType } = c.req.valid("json");
 
-		const suiClient = await cli.getSuiClient();
-
-		const coins = await suiClient.getCoins({
+		const coins = await network.client.getCoins({
 			owner: address,
 			coinType,
 			// TODO: Pagination:

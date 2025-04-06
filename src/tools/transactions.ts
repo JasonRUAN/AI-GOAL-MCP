@@ -1,7 +1,7 @@
 import { type ToolResponseType, describeTool, mValidator } from "muppet";
 import { z } from "zod";
 import { app } from "../server/app.js";
-import { cli } from "../utils/suiCli.js";
+import { optionalNetwork } from "../utils/schema.js";
 
 app.post(
 	"/get-transaction",
@@ -12,17 +12,16 @@ app.post(
 	mValidator(
 		"json",
 		z.object({
+			network: optionalNetwork,
 			digest: z
 				.string()
 				.describe("The ID of the transaction you'd like to get."),
 		}),
 	),
 	async (c) => {
-		const { digest } = c.req.valid("json");
+		const { network, digest } = c.req.valid("json");
 
-		const suiClient = await cli.getSuiClient();
-
-		const transaction = await suiClient.getTransactionBlock({
+		const transaction = await network.client.getTransactionBlock({
 			digest,
 			options: {
 				showBalanceChanges: true,

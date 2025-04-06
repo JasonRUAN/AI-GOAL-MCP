@@ -84,16 +84,4 @@ export const cli = {
 
 		return env;
 	},
-
-	async getSuiClient() {
-		const [envs, activeEnvAlias] = await cli.envs();
-
-		const env = envs.find((env) => env.alias === activeEnvAlias);
-
-		if (!env) {
-			throw new Error(`Environment ${activeEnvAlias} not found`);
-		}
-
-		return new SuiClient({ url: env.rpc });
-	},
 };

@@ -56,7 +56,7 @@ app.post(
 	},
 );
 
-// TODO: Accept bytecode directly so that we can publish via TypeScript SDK and not need to go through CLI,
+// TODO: Maybe accept bytecode directly so that we can publish via TypeScript SDK and not need to go through CLI,
 // and also so that agents can work with less fs access.
 app.post(
 	"/publish-move-package",

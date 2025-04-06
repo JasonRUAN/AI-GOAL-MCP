@@ -1,7 +1,7 @@
 import { type ToolResponseType, describeTool, mValidator } from "muppet";
 import { z } from "zod";
 import { app } from "../server/app.js";
-import { optionalAddress } from "../utils/schema.js";
+import { optionalAddress, optionalNetwork } from "../utils/schema.js";
 import { cli } from "../utils/suiCli.js";
 
 app.post(
@@ -13,15 +13,14 @@ app.post(
 	mValidator(
 		"json",
 		z.object({
+			network: optionalNetwork,
 			id: z.string().describe("The ID of the object you'd like to get."),
 		}),
 	),
 	async (c) => {
-		const { id } = c.req.valid("json");
+		const { network, id } = c.req.valid("json");
 
-		const suiClient = await cli.getSuiClient();
-
-		const object = await suiClient.getObject({
+		const object = await network.client.getObject({
 			id,
 			options: {
 				showType: true,
@@ -51,15 +50,14 @@ app.post(
 	mValidator(
 		"json",
 		z.object({
+			network: optionalNetwork,
 			address: optionalAddress,
 		}),
 	),
 	async (c) => {
-		const { address } = c.req.valid("json");
+		const { network, address } = c.req.valid("json");
 
-		const suiClient = await cli.getSuiClient();
-
-		const objects = await suiClient.getOwnedObjects({
+		const objects = await network.client.getOwnedObjects({
 			owner: address,
 			options: {
 				showType: true,
