@@ -1,6 +1,7 @@
 import { describeTool, mValidator, type ToolResponseType } from "muppet";
 import { app } from "../server/app.js";
 import { z } from "zod";
+import { cli } from "../utils/suiCli.js";
 
 app.post(
   "/set-current-network",
@@ -11,14 +12,25 @@ app.post(
   mValidator(
     "json",
     z.object({
-      network: z.enum(["mainnet", "testnet", "devnet", "localnet"]),
+      alias: z.string(),
+      url: z.string().optional(),
     })
   ),
-  (c) => {
-    const { network } = c.req.valid("json");
+  async (c) => {
+    const { alias, url } = c.req.valid("json");
+
+    const [envs] = await cli.envs();
+    if (!envs.find((env) => env.alias === alias)) {
+      if (!url) {
+        throw new Error("Network is not yet configured, URL is required");
+      }
+      await cli.newEnv(alias, url);
+    }
+
+    await cli.switchEnv(alias);
 
     return c.json<ToolResponseType>({
-      content: [{ type: "text", text: network }],
+      content: [{ type: "text", text: `Switched to "${alias}"` }],
     });
   }
 );
@@ -30,7 +42,14 @@ app.post(
     description: "Get the current Sui network",
   }),
   mValidator("json", z.object({})),
-  (c) => {
-    return c.json<ToolResponseType>([{ type: "text", text: "mainnet" }]);
+  async (c) => {
+    const env = await cli.getActiveEnv();
+
+    return c.json<ToolResponseType>([
+      {
+        type: "text",
+        text: `The network is set to "${env.alias}", RPC URL "${env.rpc}"`,
+      },
+    ]);
   }
 );

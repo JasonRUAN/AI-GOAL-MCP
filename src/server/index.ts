@@ -4,8 +4,12 @@ import "../tools/index.js";
 import { bridge, muppet } from "muppet";
 import { app } from "./app.js";
 import { getLogger } from "../logger.js";
+import { cli } from "../utils/suiCli.js";
 
 export async function startServer() {
+  // Get the version of the Sui CLI to ensure it's installed.
+  await cli.version();
+
   const mcp = await muppet(app, {
     name: "SuiMCP",
     version: "1.0.0",

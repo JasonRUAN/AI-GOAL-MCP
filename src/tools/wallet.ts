@@ -2,10 +2,7 @@ import { describeTool, mValidator, type ToolResponseType } from "muppet";
 import { app } from "../server/app.js";
 import { z } from "zod";
 import { SUI_TYPE_ARG } from "@mysten/sui/utils";
-import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
-
-// TODO: This should be stored somewhere...
-const WALLET = new Ed25519Keypair();
+import { cli } from "../utils/suiCli.js";
 
 app.post(
   "/current-address",
@@ -14,10 +11,10 @@ app.post(
     description: "Get the current wallet address",
   }),
   mValidator("json", z.object({})),
-  (c) => {
-    return c.json<ToolResponseType>([
-      { type: "text", text: WALLET.toSuiAddress() },
-    ]);
+  async (c) => {
+    const address = await cli.activeAddress();
+
+    return c.json<ToolResponseType>([{ type: "text", text: address }]);
   }
 );
 
@@ -35,8 +32,7 @@ app.post(
         .optional()
         .describe(
           "The address of the wallet you'd like to get the balance of. If empty, defaults to the current wallet."
-        )
-        .default(() => WALLET.toSuiAddress()),
+        ),
       coinType: z
         .string()
         .describe(
@@ -45,11 +41,23 @@ app.post(
         .default(SUI_TYPE_ARG),
     })
   ),
-  (c) => {
-    const { address, coinType } = c.req.valid("json");
+  async (c) => {
+    const { address = await cli.activeAddress(), coinType } =
+      c.req.valid("json");
+
+    const suiClient = await cli.getSuiClient();
+
+    // TODO: Coin metadata + decimals formatting:
+    const balance = await suiClient.getBalance({
+      owner: address,
+      coinType,
+    });
 
     return c.json<ToolResponseType>([
-      { type: "text", text: `Balance for ${address} (${coinType}) is ${100}` },
+      {
+        type: "text",
+        text: `Balance for ${address} (${coinType}) is ${balance}`,
+      },
     ]);
   }
 );
