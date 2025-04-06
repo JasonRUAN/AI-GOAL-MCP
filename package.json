@@ -1,7 +1,7 @@
 {
 	"name": "@jordangens/sui-mcp",
 	"type": "module",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"private": false,
 	"bin": {
 		"sui-mcp": "cli.js"
@@ -21,10 +21,12 @@
 		"@drizzle-team/brocli": "^0.11.0",
 		"@hono/node-server": "^1.14.0",
 		"@hono/standard-validator": "^0.1.2",
+		"@inquirer/prompts": "^7.4.1",
 		"@modelcontextprotocol/sdk": "^1.8.0",
 		"@mysten/sui": "^1.26.1",
 		"fast-glob": "^3.3.3",
 		"hono": "^4.7.5",
+		"keytar": "^7.9.0",
 		"muppet": "^0.2.0",
 		"pino": "^9.6.0",
 		"pino-pretty": "^13.0.0",

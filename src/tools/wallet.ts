@@ -1,19 +1,24 @@
 import { type ToolResponseType, describeTool, mValidator } from "muppet";
 import { z } from "zod";
 import { app } from "../server/app.js";
-import { cli } from "../utils/suiCli.js";
+import { getSuiMCPState, setSuiMCPState } from "../state/index.js";
 
 app.post(
-	"/current_address",
+	"/get_default_address",
 	describeTool({
-		name: "current_address",
-		description: "Get the current wallet address",
+		name: "get_default_address",
+		description: "Get the default wallet address",
 	}),
 	mValidator("json", z.object({})),
 	async (c) => {
-		const address = await cli.activeAddress();
+		const { state } = await getSuiMCPState();
 
-		return c.json<ToolResponseType>([{ type: "text", text: address }]);
+		return c.json<ToolResponseType>([
+			{
+				type: "text",
+				text: state.activeAddress || "No current default address found",
+			},
+		]);
 	},
 );
 
@@ -21,22 +26,19 @@ app.post(
 	"/list_addresses",
 	describeTool({
 		name: "list_addresses",
-		description: "List all addresses for the current wallet",
+		description: "List all addresses available for the current wallet",
 	}),
 	mValidator("json", z.object({})),
 	async (c) => {
-		const { addresses, activeAddress } = await cli.address();
+		const { state } = await getSuiMCPState();
 
 		return c.json<ToolResponseType>([
 			{
 				type: "text",
 				text: JSON.stringify(
 					{
-						addresses: addresses.map(([alias, address]) => ({
-							alias,
-							address,
-						})),
-						activeAddress,
+						activeAddress: state.activeAddress,
+						addresses: state.accounts,
 					},
 					null,
 					2,
@@ -47,28 +49,36 @@ app.post(
 );
 
 app.post(
-	"/switch_address",
+	"/set_default_address",
 	describeTool({
-		name: "switch_address",
-		description: "Switch to a different address",
+		name: "set_default_address",
+		description: "Set the default address of the wallet",
 	}),
 	mValidator(
 		"json",
 		z.object({
-			aliasOrAddress: z
+			address: z
 				.string()
-				.describe("The alias or address of the wallet to switch to"),
+				.describe("The address you want to set as the default"),
 		}),
 	),
 	async (c) => {
-		const { aliasOrAddress } = c.req.valid("json");
+		const { address } = c.req.valid("json");
 
-		await cli.switchAddress(aliasOrAddress);
+		const { state } = await getSuiMCPState();
+
+		if (!state.accounts.some((account) => account.address === address)) {
+			throw new Error(`Address "${address}" not found`);
+		}
+
+		state.activeAddress = address;
+
+		await setSuiMCPState(state);
 
 		return c.json<ToolResponseType>([
 			{
 				type: "text",
-				text: `Switched to "${aliasOrAddress}"`,
+				text: `Switched to "${address}"`,
 			},
 		]);
 	},

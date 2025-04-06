@@ -3,7 +3,6 @@ import { type ToolResponseType, describeTool, mValidator } from "muppet";
 import { z } from "zod";
 import { app } from "../server/app.js";
 import { optionalAddress, optionalNetwork } from "../utils/schema.js";
-import { cli } from "../utils/suiCli.js";
 
 app.post(
 	"/get_balance",

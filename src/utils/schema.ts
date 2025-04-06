@@ -4,7 +4,7 @@ import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 import fg from "fast-glob";
 import { z } from "zod";
 import { getLogger } from "../logger.js";
-import { cli } from "./suiCli.js";
+import { getSuiMCPState } from "../state/index.js";
 
 export const optionalAddress = z
 	.string()
@@ -14,48 +14,46 @@ export const optionalAddress = z
 		"The address of the wallet you'd like to use. If empty, defaults to the current wallet.",
 	)
 	.transform(async (address) => {
+		const { state } = await getSuiMCPState();
+
 		if (!address) {
-			return await cli.activeAddress();
+			if (!state.activeAddress) {
+				throw new Error("No address provided and no active address found");
+			}
+
+			return state.activeAddress;
 		}
 
 		return address;
 	});
 
-const SUI_NETWORKS = ["mainnet", "testnet", "devnet", "localnet"] as const;
 export const optionalNetwork = z
 	.string()
 	.trim()
 	.optional()
+	.default("testnet")
 	.describe(
-		"The network to use. If empty, defaults to the current network. Can either be a Sui RPC URL, or a network alias (mainnet, testnet, devnet, or localnet).",
+		"The network to use. Must be one of `mainnet`, `testnet`, `devnet`, or `localnet`. If empty, defaults to `testnet`.",
 	)
 	.transform(async (network) => {
-		if (!network || !network.trim()) {
-			const env = await cli.getActiveEnv();
-			return {
-				alias: env.alias,
-				url: env.rpc,
-				client: new SuiClient({ url: env.rpc }),
-			};
+		if (!network) {
+			// biome-ignore lint/style/noParameterAssign: Ehhh it's fine.
+			network = "testnet";
 		}
 
-		if (network.startsWith("http")) {
-			return {
-				alias: "custom",
-				url: network,
-				client: new SuiClient({ url: network }),
-			};
+		if (!["mainnet", "testnet", "devnet", "localnet"].includes(network)) {
+			throw new Error(
+				"Invalid network. Must be one of `mainnet`, `testnet`, `devnet`, or `localnet`",
+			);
 		}
 
-		if (!SUI_NETWORKS.includes(network as (typeof SUI_NETWORKS)[number])) {
-			throw new Error(`Invalid network provided: "${network}"`);
-		}
-
-		const url = getFullnodeUrl(network as (typeof SUI_NETWORKS)[number]);
 		return {
 			alias: network,
-			url,
-			client: new SuiClient({ url }),
+			client: new SuiClient({
+				url: getFullnodeUrl(
+					network as "mainnet" | "testnet" | "devnet" | "localnet",
+				),
+			}),
 		};
 	});
 

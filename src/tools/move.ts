@@ -1,8 +1,14 @@
+import { Transaction } from "@mysten/sui/transactions";
 import { type ToolResponseType, describeTool, mValidator } from "muppet";
 import { z } from "zod";
 import { app } from "../server/app.js";
-import { moveDirectory } from "../utils/schema.js";
-import { cli } from "../utils/suiCli.js";
+import { getKeypair } from "../state/index.js";
+import {
+	moveDirectory,
+	optionalAddress,
+	optionalNetwork,
+} from "../utils/schema.js";
+import { getCli } from "../utils/suiCli.js";
 
 app.post(
 	"/build_move_package",
@@ -19,12 +25,14 @@ app.post(
 	async (c) => {
 		const { directory } = c.req.valid("json");
 
+		const cli = await getCli();
+
 		const response = await cli.moveBuild(directory);
 
 		return c.json<ToolResponseType>([
 			{
 				type: "text",
-				text: response,
+				text: `${response.stdout}\n${response.stderr}`,
 			},
 		]);
 	},
@@ -45,12 +53,14 @@ app.post(
 	async (c) => {
 		const { directory } = c.req.valid("json");
 
+		const cli = await getCli();
+
 		const response = await cli.moveTest(directory);
 
 		return c.json<ToolResponseType>([
 			{
 				type: "text",
-				text: response,
+				text: `${response.stdout}\n${response.stderr}`,
 			},
 		]);
 	},
@@ -63,23 +73,53 @@ app.post(
 	describeTool({
 		name: "publish_move_package",
 		description:
-			"Publish a Sui Move package to the Sui blockchain. This tool will also build the package.",
+			"Publish a Sui Move package to the Sui blockchain. This tool will also run Move build and Move test.",
 	}),
 	mValidator(
 		"json",
 		z.object({
+			address: optionalAddress,
+			network: optionalNetwork,
 			directory: moveDirectory,
 		}),
 	),
 	async (c) => {
-		const { directory } = c.req.valid("json");
+		const { directory, address, network } = c.req.valid("json");
 
-		const response = await cli.publish(directory);
+		const cli = await getCli();
+
+		const { modules, dependencies } = JSON.parse(
+			(await cli.moveBuild(directory, { dumpBytecodeAsBase64: true })).stdout,
+		);
+
+		// TODO: Run tests and report results:
+		// const test = await cli.moveTest(directory);
+
+		const tx = new Transaction();
+
+		tx.setSender(address);
+
+		const cap = tx.publish({
+			modules,
+			dependencies,
+		});
+
+		tx.transferObjects([cap], address);
+
+		const results = await network.client.signAndExecuteTransaction({
+			transaction: tx,
+			signer: await getKeypair(address),
+			options: {
+				showEffects: true,
+				showBalanceChanges: true,
+				showEvents: true,
+			},
+		});
 
 		return c.json<ToolResponseType>([
 			{
 				type: "text",
-				text: response,
+				text: JSON.stringify(results, null, 2),
 			},
 		]);
 	},
