@@ -4,20 +4,16 @@ import { bridge, muppet } from "muppet";
 import { getLogger } from "../logger.js";
 import "../resources/index.js";
 import "../tools/index.js";
-import { cli } from "../utils/suiCli.js";
+import { getSuiMCPState } from "../state/index.js";
 import { getPackageVersion } from "../utils/version.js";
 import { app } from "./app.js";
 
-// TODO: Check if there's an active-env and active-address in the CLI, and prompt to set it up if not.
 export async function startServer() {
-	try {
-		// Get the version of the Sui CLI to ensure it's installed and working.
-		await cli.version();
-	} catch (e) {
+	const { exists } = await getSuiMCPState();
+	if (!exists) {
 		getLogger().fatal(
-			"Could not find the Sui CLI, please ensure that it is installed and try again.",
+			"Could not find the SuiMCP configuration. Please run `npx @jordangens/sui-mcp init` to create one.",
 		);
-		getLogger().fatal("https://docs.sui.io/references/cli");
 		process.exit(1);
 	}
 
@@ -31,7 +27,7 @@ export async function startServer() {
 		transport: new StdioServerTransport(),
 	});
 
-	getLogger().info("Sui MCP started, listening on stdio");
+	getLogger().info("SuiMCP started, listening on stdio");
 
 	return await mcp;
 }
