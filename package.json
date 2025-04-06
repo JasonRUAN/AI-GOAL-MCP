@@ -8,6 +8,7 @@
 	},
 	"scripts": {
 		"dev": "pnpx @modelcontextprotocol/inspector bun ./src/index.ts start -c --loglevel debug",
+		"dev:server-only": "bun ./src/index.ts --loglevel debug",
 		"build": "tsc",
 		"start": "node ./cli.js"
 	},
