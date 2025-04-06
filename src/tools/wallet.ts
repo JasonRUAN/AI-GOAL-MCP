@@ -4,9 +4,9 @@ import { app } from "../server/app.js";
 import { cli } from "../utils/suiCli.js";
 
 app.post(
-	"/current-address",
+	"/current_address",
 	describeTool({
-		name: "current-address",
+		name: "current_address",
 		description: "Get the current wallet address",
 	}),
 	mValidator("json", z.object({})),
@@ -18,9 +18,9 @@ app.post(
 );
 
 app.post(
-	"/list-addresses",
+	"/list_addresses",
 	describeTool({
-		name: "list-addresses",
+		name: "list_addresses",
 		description: "List all addresses for the current wallet",
 	}),
 	mValidator("json", z.object({})),
@@ -47,9 +47,9 @@ app.post(
 );
 
 app.post(
-	"/switch-address",
+	"/switch_address",
 	describeTool({
-		name: "switch-address",
+		name: "switch_address",
 		description: "Switch to a different address",
 	}),
 	mValidator(

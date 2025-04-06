@@ -4,9 +4,9 @@ import { app } from "../server/app.js";
 import { optionalNetwork } from "../utils/schema.js";
 
 app.post(
-	"/get-transaction",
+	"/get_transaction",
 	describeTool({
-		name: "get-transaction",
+		name: "get_transaction",
 		description: "Get a transaction by its ID",
 	}),
 	mValidator(

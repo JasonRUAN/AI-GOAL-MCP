@@ -2,12 +2,11 @@ import { type ToolResponseType, describeTool, mValidator } from "muppet";
 import { z } from "zod";
 import { app } from "../server/app.js";
 import { optionalAddress, optionalNetwork } from "../utils/schema.js";
-import { cli } from "../utils/suiCli.js";
 
 app.post(
-	"/get-object",
+	"/get_object",
 	describeTool({
-		name: "get-object",
+		name: "get_object",
 		description: "Get an object by its ID",
 	}),
 	mValidator(
@@ -42,9 +41,9 @@ app.post(
 );
 
 app.post(
-	"/get-owned-objects",
+	"/get_owned_objects",
 	describeTool({
-		name: "get-owned-objects",
+		name: "get_owned_objects",
 		description: "Get objects owned by a wallet",
 	}),
 	mValidator(

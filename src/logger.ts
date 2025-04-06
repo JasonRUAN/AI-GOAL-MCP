@@ -8,18 +8,23 @@ export function initLogger({
 	loglevel,
 	clear,
 }: {
-	logfile: string;
+	logfile?: string;
 	loglevel: string;
-	clear: boolean;
+	clear?: boolean;
 }) {
 	logger = pino(
 		{ level: loglevel },
-		pino.multistream([
-			// NOTE: We need to pass in the destination as 2 (stderr) since stdout is already being used
-			// for communication via MCP.
-			pretty({ destination: 2 }),
-			pino.destination({ dest: logfile, append: !clear }),
-		]),
+		pino.multistream(
+			[
+				// NOTE: We need to pass in the destination as 2 (stderr) since stdout is already being used
+				// for communication via MCP.
+				pretty({ destination: 2 }),
+
+				logfile
+					? pino.destination({ dest: logfile, append: !clear })
+					: undefined,
+			].filter(Boolean) as pino.DestinationStream[],
+		),
 	);
 }
 

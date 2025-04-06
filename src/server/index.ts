@@ -33,6 +33,5 @@ export async function startServer() {
 
 	getLogger().info("Sui MCP started, listening on stdio");
 
-	// Hang promise:
-	await new Promise(() => {});
+	return await mcp;
 }

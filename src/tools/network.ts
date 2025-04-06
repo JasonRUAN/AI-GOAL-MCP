@@ -4,9 +4,9 @@ import { app } from "../server/app.js";
 import { cli } from "../utils/suiCli.js";
 
 app.post(
-	"/set-current-network",
+	"/set_current_network",
 	describeTool({
-		name: "set-current-network",
+		name: "set_current_network",
 		description: "Set the current Sui network",
 	}),
 	mValidator(
@@ -36,9 +36,9 @@ app.post(
 );
 
 app.post(
-	"/get-current-network",
+	"/get_current_network",
 	describeTool({
-		name: "get-current-network",
+		name: "get_current_network",
 		description: "Get the current Sui network",
 	}),
 	mValidator("json", z.object({})),
@@ -55,9 +55,9 @@ app.post(
 );
 
 app.post(
-	"/list-networks",
+	"/list_networks",
 	describeTool({
-		name: "list-networks",
+		name: "list_networks",
 		description: "List all available Sui networks",
 	}),
 	mValidator("json", z.object({})),

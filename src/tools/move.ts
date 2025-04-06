@@ -5,9 +5,9 @@ import { moveDirectory } from "../utils/schema.js";
 import { cli } from "../utils/suiCli.js";
 
 app.post(
-	"/build-move-package",
+	"/build_move_package",
 	describeTool({
-		name: "build-move-package",
+		name: "build_move_package",
 		description: "Build a Sui Move package to bytecode",
 	}),
 	mValidator(
@@ -31,9 +31,9 @@ app.post(
 );
 
 app.post(
-	"/test-move-package	",
+	"/test_move_package	",
 	describeTool({
-		name: "test-move-package",
+		name: "test_move_package",
 		description: "Test a Sui Move package",
 	}),
 	mValidator(
@@ -59,10 +59,11 @@ app.post(
 // TODO: Maybe accept bytecode directly so that we can publish via TypeScript SDK and not need to go through CLI,
 // and also so that agents can work with less fs access.
 app.post(
-	"/publish-move-package",
+	"/publish_move_package",
 	describeTool({
-		name: "publish-move-package",
-		description: "Publish a Sui Move package to the Sui blockchain",
+		name: "publish_move_package",
+		description:
+			"Publish a Sui Move package to the Sui blockchain. This tool will also build the package.",
 	}),
 	mValidator(
 		"json",
