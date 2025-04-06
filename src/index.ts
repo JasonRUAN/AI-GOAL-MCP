@@ -2,14 +2,15 @@ import { command, string, run, boolean } from "@drizzle-team/brocli";
 import { getLogger, setLogger } from "./logger.js";
 import { pino } from "pino";
 import { startServer } from "./server/index.js";
+import path from "path";
 
 const start = command({
   name: "start",
   options: {},
-  handler: async (opts) => {
+  handler: (opts) => {
     getLogger().debug("Starting server");
 
-    await startServer();
+    startServer();
   },
 });
 
@@ -24,7 +25,7 @@ run([start], {
     logfile: string()
       .desc("The file you want to log to")
       .alias("f")
-      .default("./sui-mcp.log"),
+      .default(path.join(import.meta.dirname, "./sui-mcp.log")),
 
     loglevel: string()
       .enum("info", "debug", "warn", "error")
@@ -40,9 +41,11 @@ run([start], {
 
       setLogger(logger);
 
-      logger.debug(`Running command: ${command}`);
+      logger.debug(`Running command: ${JSON.stringify(command, null, 2)}`);
     } else if (event === "after") {
-      getLogger().debug(`Command finished: ${command}`);
+      getLogger().debug(
+        `Command finished: ${JSON.stringify(command, null, 2)}`
+      );
     }
   },
 });

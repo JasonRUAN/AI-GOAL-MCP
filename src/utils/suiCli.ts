@@ -4,11 +4,18 @@ import { SuiClient } from "@mysten/sui/client";
 
 const execFileAsync = util.promisify(execFile);
 
-export async function exec<T = string>(args: string[]): Promise<T> {
-  const { stdout, stderr } = await execFileAsync("sui", [...args]);
+async function exec<T = string>(
+  args: string[],
+  { blendedOutput }: { blendedOutput?: boolean } = {}
+): Promise<T> {
+  let { stdout, stderr } = await execFileAsync("sui", [...args]);
 
-  if (stderr) {
-    throw new Error(stderr);
+  if (!blendedOutput) {
+    if (stderr) {
+      throw new Error(stderr);
+    }
+  } else {
+    stdout = stdout.trim() + "\n" + stderr.trim();
   }
 
   const ret = stdout.trim();
@@ -28,6 +35,11 @@ export async function exec<T = string>(args: string[]): Promise<T> {
 // instead just parse the client config file directly, but this is easier for now.
 export const cli = {
   version: async () => await exec(["--version"]),
+  address: async () =>
+    await exec<{
+      activeAddress: string;
+      addresses: [alias: string, address: string][];
+    }>(["client", "addresses", "--json"]),
   activeAddress: async () => await exec(["client", "active-address"]),
   envs: async () =>
     await exec<
@@ -45,6 +57,21 @@ export const cli = {
     await exec(["client", "new-env", "--alias", alias, "--rpc", url]),
   switchEnv: async (env: string) =>
     await exec(["client", "switch", "--env", env]),
+  switchAddress: async (address: string) =>
+    await exec(["client", "switch", "--address", address]),
+
+  moveBuild: async (directory: string) =>
+    await exec(["move", "build", "--path", directory, "--json-errors"], {
+      blendedOutput: true,
+    }),
+  moveTest: async (directory: string) =>
+    await exec(["move", "test", "--path", directory, "--json-errors"], {
+      blendedOutput: true,
+    }),
+  publish: async (directory: string) =>
+    await exec(["client", "publish", directory, "--json", "--json-errors"], {
+      blendedOutput: true,
+    }),
 
   async getActiveEnv() {
     const [envs, activeEnvAlias] = await cli.envs();

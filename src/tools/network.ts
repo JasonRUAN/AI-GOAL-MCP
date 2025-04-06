@@ -53,3 +53,32 @@ app.post(
     ]);
   }
 );
+
+app.post(
+  "/list-networks",
+  describeTool({
+    name: "list-networks",
+    description: "List all available Sui networks",
+  }),
+  mValidator("json", z.object({})),
+  async (c) => {
+    const [envs, activeEnv] = await cli.envs();
+
+    return c.json<ToolResponseType>([
+      {
+        type: "text",
+        text: JSON.stringify(
+          {
+            envs: envs.map((env) => ({
+              alias: env.alias,
+              url: env.rpc,
+            })),
+            current: activeEnv,
+          },
+          null,
+          2
+        ),
+      },
+    ]);
+  }
+);

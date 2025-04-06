@@ -1,7 +1,6 @@
 import { describeTool, mValidator, type ToolResponseType } from "muppet";
 import { app } from "../server/app.js";
 import { z } from "zod";
-import { SUI_TYPE_ARG } from "@mysten/sui/utils";
 import { cli } from "../utils/suiCli.js";
 
 app.post(
@@ -19,44 +18,57 @@ app.post(
 );
 
 app.post(
-  "/get-balance",
+  "/list-addresses",
   describeTool({
-    name: "get-balance",
-    description: "Get the balance of a wallet",
+    name: "list-addresses",
+    description: "List all addresses for the current wallet",
   }),
-  mValidator(
-    "json",
-    z.object({
-      address: z
-        .string()
-        .optional()
-        .describe(
-          "The address of the wallet you'd like to get the balance of. If empty, defaults to the current wallet."
-        ),
-      coinType: z
-        .string()
-        .describe(
-          "The coin type you'd like to get the balance for. Defaults to the SUI coin type."
-        )
-        .default(SUI_TYPE_ARG),
-    })
-  ),
+  mValidator("json", z.object({})),
   async (c) => {
-    const { address = await cli.activeAddress(), coinType } =
-      c.req.valid("json");
-
-    const suiClient = await cli.getSuiClient();
-
-    // TODO: Coin metadata + decimals formatting:
-    const balance = await suiClient.getBalance({
-      owner: address,
-      coinType,
-    });
+    const { addresses, activeAddress } = await cli.address();
 
     return c.json<ToolResponseType>([
       {
         type: "text",
-        text: `Balance for ${address} (${coinType}) is ${balance}`,
+        text: JSON.stringify(
+          {
+            addresses: addresses.map(([alias, address]) => ({
+              alias,
+              address,
+            })),
+            activeAddress,
+          },
+          null,
+          2
+        ),
+      },
+    ]);
+  }
+);
+
+app.post(
+  "/switch-address",
+  describeTool({
+    name: "switch-address",
+    description: "Switch to a different address",
+  }),
+  mValidator(
+    "json",
+    z.object({
+      aliasOrAddress: z
+        .string()
+        .describe("The alias or address of the wallet to switch to"),
+    })
+  ),
+  async (c) => {
+    const { aliasOrAddress } = c.req.valid("json");
+
+    await cli.switchAddress(aliasOrAddress);
+
+    return c.json<ToolResponseType>([
+      {
+        type: "text",
+        text: `Switched to "${aliasOrAddress}"`,
       },
     ]);
   }

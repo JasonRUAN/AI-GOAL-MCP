@@ -12,6 +12,7 @@
     "@modelcontextprotocol/sdk": "^1.8.0",
     "@mysten/sui": "^1.26.1",
     "@types/bun": "^1.2.8",
+    "fast-glob": "^3.3.3",
     "hono": "^4.7.5",
     "muppet": "^0.2.0",
     "pino": "^9.6.0",
