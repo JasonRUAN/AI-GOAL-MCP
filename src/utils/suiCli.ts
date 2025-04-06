@@ -10,14 +10,17 @@ export async function getCli() {
 			directory: string,
 			options: { dumpBytecodeAsBase64?: boolean } = {},
 		) =>
-			await execFileAsync("sui", [
-				"move",
-				"build",
-				"--path",
-				directory,
-				"--json-errors",
-				options.dumpBytecodeAsBase64 ? "--dump-bytecode-as-base64" : "",
-			]),
+			await execFileAsync(
+				"sui",
+				[
+					"move",
+					"build",
+					"--path",
+					directory,
+					"--json-errors",
+					options.dumpBytecodeAsBase64 ? "--dump-bytecode-as-base64" : "",
+				].filter(Boolean),
+			),
 
 		moveTest: async (directory: string) =>
 			await execFileAsync("sui", [

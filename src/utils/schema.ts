@@ -28,14 +28,32 @@ export const optionalAddress = z
 	});
 
 export const optionalNetwork = z
-	.enum(["mainnet", "testnet", "devnet", "localnet"])
+	.string()
+	.trim()
 	.optional()
 	.default("testnet")
-	.describe("The network to use. If empty, defaults to 'testnet'.")
+	.describe(
+		"The network to use. Must be one of `mainnet`, `testnet`, `devnet`, or `localnet`. If empty, defaults to `testnet`.",
+	)
 	.transform(async (network) => {
+		if (!network) {
+			// biome-ignore lint/style/noParameterAssign: Ehhh it's fine.
+			network = "testnet";
+		}
+
+		if (!["mainnet", "testnet", "devnet", "localnet"].includes(network)) {
+			throw new Error(
+				"Invalid network. Must be one of `mainnet`, `testnet`, `devnet`, or `localnet`",
+			);
+		}
+
 		return {
 			alias: network,
-			client: new SuiClient({ url: getFullnodeUrl(network) }),
+			client: new SuiClient({
+				url: getFullnodeUrl(
+					network as "mainnet" | "testnet" | "devnet" | "localnet",
+				),
+			}),
 		};
 	});
 
