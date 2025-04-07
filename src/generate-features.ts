@@ -1,7 +1,7 @@
-import { initLogger } from "./logger.js";
+import { logger } from "./logger.js";
 import { startServer } from "./server/index.js";
 
-initLogger({ loglevel: "fatal" });
+logger.level = "fatal";
 
 const mcp = await startServer();
 
