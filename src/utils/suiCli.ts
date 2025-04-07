@@ -1,6 +1,6 @@
 import { execFile } from "node:child_process";
 import util from "node:util";
-import { getLogger } from "../logger.js";
+import { logger } from "../logger.js";
 
 const execFileAsync = util.promisify(execFile);
 
@@ -36,10 +36,10 @@ export async function getCli() {
 		// Get the version of the Sui CLI to ensure it's installed and working.
 		await execFileAsync("sui", ["--version"]);
 	} catch (e) {
-		getLogger().fatal(
+		logger.fatal(
 			"Could not find the Sui CLI, please ensure that it is installed and try again.",
 		);
-		getLogger().fatal("https://docs.sui.io/references/cli");
+		logger.fatal("https://docs.sui.io/references/cli");
 		process.exit(1);
 	}
 

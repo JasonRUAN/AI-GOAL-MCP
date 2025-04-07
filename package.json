@@ -7,8 +7,8 @@
 		"sui-mcp": "cli.js"
 	},
 	"scripts": {
-		"dev": "pnpx @modelcontextprotocol/inspector bun ./src/index.ts start -c --loglevel debug",
-		"dev:server-only": "bun ./src/index.ts --loglevel debug",
+		"dev": "pnpx @modelcontextprotocol/inspector bun ./src/index.ts start --loglevel debug",
+		"dev:server-only": "bun ./src/index.ts",
 		"build": "tsc -b",
 		"start": "node ./cli.js",
 		"prepare": "pnpm run build"

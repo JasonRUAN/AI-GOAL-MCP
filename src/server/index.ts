@@ -1,9 +1,9 @@
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
 import { bridge, muppet } from "muppet";
-import { getLogger } from "../logger.js";
 import "../resources/index.js";
 import "../tools/index.js";
+import { logger } from "../logger.js";
 import { getSuiMCPState } from "../state/index.js";
 import { getPackageVersion } from "../utils/version.js";
 import { app } from "./app.js";
@@ -11,7 +11,7 @@ import { app } from "./app.js";
 export async function startServer() {
 	const { exists } = await getSuiMCPState();
 	if (!exists) {
-		getLogger().fatal(
+		logger.fatal(
 			"Could not find the SuiMCP configuration. Please run `npx @jordangens/sui-mcp init` to create one.",
 		);
 		process.exit(1);
@@ -27,7 +27,7 @@ export async function startServer() {
 		transport: new StdioServerTransport(),
 	});
 
-	getLogger().info("SuiMCP started, listening on stdio");
+	logger.info("SuiMCP started, listening on stdio");
 
 	return await mcp;
 }
