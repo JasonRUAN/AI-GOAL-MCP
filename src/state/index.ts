@@ -1,7 +1,10 @@
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
+import { decodeSuiPrivateKey } from "@mysten/sui/cryptography";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
+import { Secp256k1Keypair } from "@mysten/sui/keypairs/secp256k1";
+import { Secp256r1Keypair } from "@mysten/sui/keypairs/secp256r1";
 import keytar from "keytar";
 import { z } from "zod";
 
@@ -28,10 +31,28 @@ function getStatePath() {
 	);
 }
 
+const SCHEMA_TO_KEYPAIR_CONSTRUCTOR = {
+	ED25519: Ed25519Keypair,
+	Secp256k1: Secp256k1Keypair,
+	Secp256r1: Secp256r1Keypair,
+	// Unsuppored keypairs:
+	MultiSig: null,
+	ZkLogin: null,
+	Passkey: null,
+} as const;
+
 export async function importAccount(privateKey: string) {
 	const { state } = await getSuiMCPState();
 
-	const keypair = Ed25519Keypair.fromSecretKey(privateKey);
+	const { schema, secretKey } = decodeSuiPrivateKey(privateKey);
+
+	const KeypairConstructor = SCHEMA_TO_KEYPAIR_CONSTRUCTOR[schema];
+
+	if (!KeypairConstructor) {
+		throw new Error(`Unsupported key scheme: ${schema}`);
+	}
+
+	const keypair = KeypairConstructor.fromSecretKey(secretKey);
 
 	await keytar.setPassword(SUI_MCP_SERVICE, keypair.toSuiAddress(), privateKey);
 

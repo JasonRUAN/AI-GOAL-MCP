@@ -1,39 +1,79 @@
 import path from "node:path";
 import { boolean, command, run, string } from "@drizzle-team/brocli";
-import { password } from "@inquirer/prompts";
+import { confirm, password } from "@inquirer/prompts";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { getLogger, initLogger } from "./logger.js";
 import { startServer } from "./server/index.js";
 import { getSuiMCPState, importAccount } from "./state/index.js";
+import {
+	getSuiClientKeypairs,
+	hasSuiClientKeypairs,
+} from "./utils/suiConfig.js";
 import { getPackageVersion } from "./utils/version.js";
+
+async function importAccounts() {
+	const kps = await getSuiClientKeypairs();
+
+	for (const kp of kps) {
+		const { address } = await importAccount(kp.secretKey);
+		console.log(`Imported account ${address}`);
+	}
+
+	console.log(`Initialized SuiMCP with ${kps.length} accounts`);
+}
+
+async function createNewAccount() {
+	console.log(
+		"To use SuiMCP, you need to import an account. Enter a private key below, or leave empty to generate a new one",
+	);
+
+	let privateKey = await password({
+		message: "Private Key",
+	});
+
+	if (!privateKey) {
+		privateKey = Ed25519Keypair.generate().getSecretKey();
+	}
+
+	const { address } = await importAccount(privateKey);
+
+	console.log(`Initialized SuiMCP with account ${address}`);
+}
 
 const init = command({
 	name: "init",
-	handler: async () => {
-		const { exists } = await getSuiMCPState();
+	options: {
+		force: boolean()
+			.desc("Force initialization even if SuiMCP is already initialized")
+			.default(false),
+	},
+	handler: async ({ force }) => {
+		if (!force) {
+			const { exists } = await getSuiMCPState();
 
-		if (exists) {
-			getLogger().info(
-				"SuiMCP is already initialized, skipping initailization.",
-			);
-			return;
+			if (exists) {
+				getLogger().info(
+					"SuiMCP is already initialized, skipping initailization.",
+				);
+				return;
+			}
 		}
 
-		console.log(
-			"To use SuiMCP, you need to improve an account. Enter a private key below, or leave empty to generate a new one",
-		);
+		const hasAccounts = await hasSuiClientKeypairs();
+		if (hasAccounts) {
+			const confirmInit = await confirm({
+				message: "Do you want to import your accounts from the Sui CLI?",
+				default: true,
+			});
 
-		let privateKey = await password({
-			message: "Private Key",
-		});
-
-		if (!privateKey) {
-			privateKey = Ed25519Keypair.generate().getSecretKey();
+			if (confirmInit) {
+				await importAccounts();
+			} else {
+				await createNewAccount();
+			}
+		} else {
+			await createNewAccount();
 		}
-
-		const { address } = await importAccount(privateKey);
-
-		console.log(`Initialized SuiMCP with account ${address}`);
 	},
 });
 
