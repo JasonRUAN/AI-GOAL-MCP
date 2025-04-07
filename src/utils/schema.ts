@@ -3,7 +3,7 @@ import path from "node:path";
 import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 import fg from "fast-glob";
 import { z } from "zod";
-import { getLogger } from "../logger.js";
+import { logger } from "../logger.js";
 import { getSuiMCPState } from "../state/index.js";
 
 export const optionalAddress = z
@@ -77,9 +77,7 @@ export const moveDirectory = z
 		}
 
 		if (moveToml.length > 1) {
-			getLogger().warn(
-				"Multiple Move.toml files found, using the shortest one",
-			);
+			logger.warn("Multiple Move.toml files found, using the shortest one");
 		}
 
 		return path.join(directory, path.dirname(moveToml[0]));

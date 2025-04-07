@@ -1,12 +1,12 @@
 import { Hono } from "hono";
 import { logger as honoLogger } from "hono/logger";
 import type { ToolResponseType } from "muppet";
-import { getLogger } from "../logger.js";
+import { logger } from "../logger.js";
 
 export const app = new Hono();
 
 app.onError((err, c) => {
-	getLogger().error(err);
+	logger.error(err);
 
 	return c.json<ToolResponseType>(
 		{
@@ -27,4 +27,4 @@ app.notFound((c) => {
 	return c.json({ error: "Not Found" }, 404);
 });
 
-app.use(honoLogger((message, ...rest) => getLogger().info(message, ...rest)));
+app.use(honoLogger((message, ...rest) => logger.info(message, ...rest)));

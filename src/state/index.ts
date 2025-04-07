@@ -1,6 +1,7 @@
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
+import { password } from "@inquirer/prompts";
 import { decodeSuiPrivateKey } from "@mysten/sui/cryptography";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { Secp256k1Keypair } from "@mysten/sui/keypairs/secp256k1";
@@ -41,6 +42,19 @@ const SCHEMA_TO_KEYPAIR_CONSTRUCTOR = {
 	Passkey: null,
 } as const;
 
+export async function createNewAccount() {
+	let privateKey = await password({
+		message: "Private Key",
+		mask: true,
+	});
+
+	if (!privateKey) {
+		privateKey = Ed25519Keypair.generate().getSecretKey();
+	}
+
+	return await importAccount(privateKey);
+}
+
 export async function importAccount(privateKey: string) {
 	const { state } = await getSuiMCPState();
 
@@ -65,6 +79,22 @@ export async function importAccount(privateKey: string) {
 	await setSuiMCPState(state);
 
 	return { address: keypair.toSuiAddress() };
+}
+
+export async function deleteAccount(address: string) {
+	const { state } = await getSuiMCPState();
+
+	state.accounts = state.accounts.filter(
+		(account) => account.address !== address,
+	);
+
+	if (state.activeAddress === address) {
+		state.activeAddress = state.accounts[0]?.address ?? null;
+	}
+
+	await keytar.deletePassword(SUI_MCP_SERVICE, address);
+
+	await setSuiMCPState(state);
 }
 
 export async function getSuiMCPState() {
