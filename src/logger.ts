@@ -13,7 +13,7 @@ export const logger = pino(
 				? pino.destination({
 						dest:
 							process.env.SUI_MCP_LOG_FILE ||
-							path.join(process.cwd(), "sui-mcp.log"),
+							path.join(import.meta.dirname, "sui-mcp.log"),
 						append: false,
 					})
 				: undefined,
