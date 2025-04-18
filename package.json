@@ -1,7 +1,7 @@
 {
-	"name": "@jordangens/sui-mcp",
+	"name": "@jasonruan/sui-mcp",
 	"type": "module",
-	"version": "0.0.5",
+	"version": "0.0.14",
 	"private": false,
 	"bin": {
 		"sui-mcp": "cli.js"
@@ -11,7 +11,8 @@
 		"dev:server-only": "bun ./src/index.ts",
 		"build": "tsc -b",
 		"start": "node ./cli.js",
-		"prepare": "pnpm run build"
+		"prepare": "pnpm run build",
+		"test:ai-suggestion": "ts-node-esm src/tests/test-ai-suggestion.ts"
 	},
 	"files": ["cli.js", "dist"],
 	"publishConfig": {
@@ -23,7 +24,8 @@
 		"@hono/standard-validator": "^0.1.2",
 		"@inquirer/prompts": "^7.4.1",
 		"@modelcontextprotocol/sdk": "^1.8.0",
-		"@mysten/sui": "^1.26.1",
+		"@mysten/sui": "^1.27.1",
+		"@mysten/walrus": "^0.0.16",
 		"fast-glob": "^3.3.3",
 		"hono": "^4.7.5",
 		"keytar": "^7.9.0",

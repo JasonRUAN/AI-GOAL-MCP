@@ -9,7 +9,7 @@ app.post(
 		name: "get_default_address",
 		description: "Get the default wallet address",
 	}),
-	mValidator("json", z.object({})),
+	mValidator("json", z.object({})), // 验证请求体应该是一个空对象
 	async (c) => {
 		const { state } = await getSuiMCPState();
 

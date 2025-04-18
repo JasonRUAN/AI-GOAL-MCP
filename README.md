@@ -7,7 +7,12 @@ An [MCP server](https://modelcontextprotocol.io/) for the [Sui network](https://
 To get started, run the following init command to setup SuiMCP:
 
 ```bash
-npx @jordangens/sui-mcp@latest init
+npx @jasonruan/sui-mcp@latest init
+
+✔ Do you want to import your accounts from the Sui CLI? No
+To use SuiMCP, you need to import an account. Enter a private key below, or leave empty to generate a new one
+✔ Private Key **********************************************************************
+Initialized SuiMCP with account 0xfbe1d8ae7a6ca3f94d670c57307376619696feb9b43069e55e53ae088b98ef8c
 ```
 
 This will setup the Wallet that you'll use to interact with the chain. You can then configure your client with the following MCP configuration:
@@ -17,7 +22,7 @@ This will setup the Wallet that you'll use to interact with the chain. You can t
   "mcpServers": {
     "suiMcp": {
       "command": "npx",
-      "args": ["@jordangens/sui-mcp@latest", "start"]
+      "args": ["@jasonruan/sui-mcp@latest", "start"]
     }
   }
 }

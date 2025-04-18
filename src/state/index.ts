@@ -68,6 +68,12 @@ export async function importAccount(privateKey: string) {
 
 	const keypair = KeypairConstructor.fromSecretKey(secretKey);
 
+	// keytar 会根据不同操作系统使用各自的安全密钥存储机制：
+	//     - Windows: 使用凭据管理器 (Credential Manager)
+	//     - macOS: 使用钥匙串 (Keychain)
+	//     - Linux: 使用 libsecret 或 gnome-keyring
+	// 在此代码中，它被用于安全存储加密货币钱包的私钥，以便应用程序可以在需要时安全地检索这些私钥，而不是将它们以明文形式存储在文件系统中。
+	// 代码使用了常量 SUI_MCP_SERVICE（"sui-mcp"）作为服务名称，以区分这个应用程序存储的密钥与系统中其他应用程序存储的密钥。
 	await keytar.setPassword(SUI_MCP_SERVICE, keypair.toSuiAddress(), privateKey);
 
 	state.accounts.push({
@@ -84,10 +90,12 @@ export async function importAccount(privateKey: string) {
 export async function deleteAccount(address: string) {
 	const { state } = await getSuiMCPState();
 
+	//  过滤掉要删除的账户
 	state.accounts = state.accounts.filter(
 		(account) => account.address !== address,
 	);
 
+	// 如果删除的是当前活跃账户，则更新活跃账户
 	if (state.activeAddress === address) {
 		state.activeAddress = state.accounts[0]?.address ?? null;
 	}

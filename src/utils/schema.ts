@@ -1,6 +1,7 @@
 import { stat } from "node:fs/promises";
 import path from "node:path";
 import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
+import { WalrusClient } from "@mysten/walrus";
 import fg from "fast-glob";
 import { z } from "zod";
 import { logger } from "../logger.js";
@@ -36,6 +37,8 @@ export const optionalNetwork = z
 		"The network to use. Must be one of `mainnet`, `testnet`, `devnet`, or `localnet`. If empty, defaults to `testnet`.",
 	)
 	.transform(async (network) => {
+		// .transform() 是 Zod 库中一个强大的功能，它允许你在验证数据后对数据进行转换。
+
 		if (!network) {
 			// biome-ignore lint/style/noParameterAssign: Ehhh it's fine.
 			network = "testnet";
@@ -47,13 +50,21 @@ export const optionalNetwork = z
 			);
 		}
 
+		const suiClient = new SuiClient({
+			url: getFullnodeUrl(
+				network as "mainnet" | "testnet" | "devnet" | "localnet",
+			),
+		});
+
+		const walrusClient = new WalrusClient({
+			network: network as "testnet" | "mainnet",
+			suiClient,
+		});
+
 		return {
 			alias: network,
-			client: new SuiClient({
-				url: getFullnodeUrl(
-					network as "mainnet" | "testnet" | "devnet" | "localnet",
-				),
-			}),
+			client: suiClient,
+			walrusClient,
 		};
 	});
 

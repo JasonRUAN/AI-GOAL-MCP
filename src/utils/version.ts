@@ -3,7 +3,7 @@ import path from "node:path";
 
 export async function getPackageVersion() {
 	const packageJson = await fs.readFile(
-		path.join(import.meta.dirname, "../../package.json"),
+		path.join(import.meta.dirname, "../../../package.json"),
 		"utf-8",
 	);
 
