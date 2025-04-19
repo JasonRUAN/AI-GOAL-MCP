@@ -1,5 +1,6 @@
 import type { Keypair } from "@mysten/sui/cryptography";
 import type { WalrusClient } from "@mysten/walrus";
+import * as fs from 'fs';
 
 export async function retrieveBlob(walrusClient: WalrusClient, blobId: string) {
 	const blobBytes = await walrusClient.readBlob({ blobId });
@@ -24,12 +25,14 @@ export async function writeBlob(
 export async function writeFileBlob(
 	walrusClient: WalrusClient,
 	keypair: Keypair,
-	file: File,
+	file_path: string,
 	epochs: number,
 ) {
-	const fileBuffer = await file.arrayBuffer();
+	const fileBuffer = fs.readFileSync(file_path);
+	const fileBlob = new Uint8Array(fileBuffer);
+
 	const { blobId } = await walrusClient.writeBlob({
-		blob: new Uint8Array(fileBuffer),
+		blob: fileBlob,
 		deletable: false,
 		epochs,
 		signer: keypair,

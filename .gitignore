@@ -30,3 +30,4 @@ lerna-debug.log*
 
 # build
 dist/
+run.sh

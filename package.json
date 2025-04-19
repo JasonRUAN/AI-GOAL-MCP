@@ -1,45 +1,48 @@
 {
-	"name": "@jasonruan/sui-mcp",
-	"type": "module",
-	"version": "0.0.14",
-	"private": false,
-	"bin": {
-		"sui-mcp": "cli.js"
-	},
-	"scripts": {
-		"dev": "pnpx @modelcontextprotocol/inspector bun ./src/index.ts start --loglevel debug",
-		"dev:server-only": "bun ./src/index.ts",
-		"build": "tsc -b",
-		"start": "node ./cli.js",
-		"prepare": "pnpm run build",
-		"test:ai-suggestion": "ts-node-esm src/tests/test-ai-suggestion.ts"
-	},
-	"files": ["cli.js", "dist"],
-	"publishConfig": {
-		"access": "public"
-	},
-	"dependencies": {
-		"@drizzle-team/brocli": "^0.11.0",
-		"@hono/node-server": "^1.14.0",
-		"@hono/standard-validator": "^0.1.2",
-		"@inquirer/prompts": "^7.4.1",
-		"@modelcontextprotocol/sdk": "^1.8.0",
-		"@mysten/sui": "^1.27.1",
-		"@mysten/walrus": "^0.0.16",
-		"fast-glob": "^3.3.3",
-		"hono": "^4.7.5",
-		"keytar": "^7.9.0",
-		"muppet": "^0.2.0",
-		"pino": "^9.6.0",
-		"pino-pretty": "^13.0.0",
-		"yaml": "^2.7.1",
-		"zod": "^3.24.2"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "1.9.4",
-		"@modelcontextprotocol/inspector": "^0.8.1",
-		"@types/bun": "^1.2.8",
-		"@types/node": "^20.11.17",
-		"typescript": "^5.8.3"
-	}
+    "name": "@jasonruan/sui-mcp",
+    "type": "module",
+    "version": "0.0.24",
+    "private": false,
+    "bin": {
+        "sui-mcp": "cli.js"
+    },
+    "scripts": {
+        "dev": "pnpx @modelcontextprotocol/inspector bun ./src/index.ts start --loglevel debug",
+        "dev:server-only": "bun ./src/index.ts",
+        "build": "tsc -b",
+        "start": "node ./cli.js",
+        "prepare": "pnpm run build",
+        "test:ai-suggestion": "ts-node-esm src/tests/test-ai-suggestion.ts"
+    },
+    "files": [
+        "cli.js",
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "dependencies": {
+        "@drizzle-team/brocli": "^0.11.0",
+        "@hono/node-server": "^1.14.0",
+        "@hono/standard-validator": "^0.1.2",
+        "@inquirer/prompts": "^7.4.1",
+        "@modelcontextprotocol/sdk": "^1.8.0",
+        "@mysten/sui": "^1.27.1",
+        "@mysten/walrus": "^0.0.16",
+        "fast-glob": "^3.3.3",
+        "hono": "^4.7.5",
+        "keytar": "^7.9.0",
+        "muppet": "^0.2.0",
+        "pino": "^9.6.0",
+        "pino-pretty": "^13.0.0",
+        "yaml": "^2.7.1",
+        "zod": "^3.24.2"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "1.9.4",
+        "@modelcontextprotocol/inspector": "^0.8.1",
+        "@types/bun": "^1.2.8",
+        "@types/node": "^20.11.17",
+        "typescript": "^5.8.3"
+    }
 }
