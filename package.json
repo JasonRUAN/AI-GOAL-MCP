@@ -1,7 +1,7 @@
 {
     "name": "@jasonruan/sui-mcp",
     "type": "module",
-    "version": "0.0.24",
+    "version": "0.0.26",
     "private": false,
     "bin": {
         "sui-mcp": "cli.js"
